@@ -36,15 +36,6 @@ module.exports = (sequelize, DataTypes) => {
       password: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-          len: [8, 20],
-          msg: 'Mật khẩu phải dài từ 8 đến 20 ký tự',
-        },
-        // isStrongPassword(value) {
-        //   if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value)) {
-        //     throw new Error('Mật khẩu phải chứa ít nhất một chữ cái viết thường, một chữ cái viết hoa, một chữ số và một ký tự đặc biệt');
-        //   }
-        // },
       },
       isAuthor: {
         type: DataTypes.BOOLEAN,
