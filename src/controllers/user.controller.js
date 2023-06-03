@@ -16,7 +16,7 @@ module.exports.signupUser = async (req, res) => {
   try {
     const user = await db.User.findOne({ where: { email: email } })
     if (user) {
-      return res.json({ message: 'Email đã tồn tại', user })
+      return res.json({ message: 'Email đã tồn tại' })
     }
   } catch (error) {
     return res.json({ error })
@@ -26,7 +26,7 @@ module.exports.signupUser = async (req, res) => {
   try {
     const userBody = { ...req.body, password: hashPw, isAuthor }
     const user = await db.User.create(userBody)
-    res.json({ message: 'Đăng ký thành công', user })
+    res.json({ message: 'Đăng ký thành công' })
   } catch (error) {
     res.json({ error })
   }
