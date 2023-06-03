@@ -16,15 +16,35 @@ module.exports = (sequelize, DataTypes) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          isAlphanumeric: {
+            args: true,
+            msg: 'Tên của bạn không hợp lệ',
+          },
+        },
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
+        validate: {
+          isEmail: {
+            msg: 'Email của bạn không hợp lệ',
+          },
+        },
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          len: [8, 20],
+          msg: 'Mật khẩu phải dài từ 8 đến 20 ký tự',
+        },
+        // isStrongPassword(value) {
+        //   if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/.test(value)) {
+        //     throw new Error('Mật khẩu phải chứa ít nhất một chữ cái viết thường, một chữ cái viết hoa, một chữ số và một ký tự đặc biệt');
+        //   }
+        // },
       },
       isAuthor: {
         type: DataTypes.BOOLEAN,
