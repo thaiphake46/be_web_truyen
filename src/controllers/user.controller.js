@@ -1,8 +1,11 @@
 'use strict'
+require('dotenv').config()
 var bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const db = require('../db/models/index')
-const services = require('../services/user.service')
+const { createANewUser, findUserByEmail } = require('../services/user.service')
+const {
+  generateAccessToken,
+  generateRefreshToken,
+} = require('../services/jwt.service')
 
 module.exports.signupUser = async (req, res) => {
   const { password, email } = req.body
@@ -17,7 +20,7 @@ module.exports.signupUser = async (req, res) => {
 
   // kiểm tra email tồn tại trong db
   try {
-    const user = await services.findUserByEmail(email)
+    const user = await findUserByEmail(email)
     if (user) {
       return res.json({ message: 'Email đã tồn tại' })
     }
@@ -28,7 +31,7 @@ module.exports.signupUser = async (req, res) => {
   // tạo mới user vào db
   try {
     const userBody = { ...req.body, password: hashPw, isAuthor }
-    const user = await services.createANewUser(userBody)
+    await createANewUser(userBody)
     res.json({ message: 'Đăng ký thành công' })
   } catch (error) {
     res.json({ error })
@@ -39,12 +42,18 @@ module.exports.signinUser = async (req, res) => {
   const { email, password } = req.body
   // kiểm tra đúng email và mật khẩu trong db
   try {
-    const user = await services.findUserByEmail(email)
+    const user = await findUserByEmail(email)
     let equalPw = bcrypt.compareSync(password, user.password)
     if (user && equalPw) {
+      const info = { id: user.id, name: user.name, isAuthor: user.isAuthor }
+
       return res.json({
         message: 'Đăng nhập thành công',
-        user: { id: user.id, name: user.name },
+        user: info,
+        token: {
+          accessToken: generateAccessToken(info),
+          refreshToken: generateRefreshToken(info),
+        },
       })
     } else {
       return res.json({
