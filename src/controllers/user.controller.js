@@ -1,7 +1,11 @@
 'use strict'
 require('dotenv').config()
 var bcrypt = require('bcryptjs')
-const { createANewUser, findUserByEmail } = require('../services/user.service')
+const {
+  createANewUser,
+  findUserByEmail,
+  findUserById,
+} = require('../services/user.service')
 const {
   generateAccessToken,
   generateRefreshToken,
@@ -46,13 +50,24 @@ module.exports.signinUser = async (req, res) => {
     let equalPw = bcrypt.compareSync(password, user.password)
     if (user && equalPw) {
       const info = { id: user.id, name: user.name, isAuthor: user.isAuthor }
-
+      res.cookie('app_session', 'app_session', {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      })
+      // .cookie('ac_token', generateAccessToken(info), {
+      //   maxAge: 3600000,
+      //   httpOnly,
+      // })
+      const at = generateAccessToken(info)
+      const rt = generateRefreshToken(info)
+      user.refreshToken = rt
+      await user.save()
       return res.json({
         message: 'Đăng nhập thành công',
         user: info,
         token: {
-          accessToken: generateAccessToken(info),
-          refreshToken: generateRefreshToken(info),
+          accessToken: at,
+          refreshToken: rt,
         },
       })
     } else {
@@ -61,6 +76,19 @@ module.exports.signinUser = async (req, res) => {
       })
     }
   } catch (error) {
-    return res.json({ error })
+    return res.send(error)
+  }
+}
+
+module.exports.logoutUser = async (req, res) => {
+  try {
+    const dataToken = req.decodedToken
+    const user = await findUserById(dataToken.id)
+    user.refreshToken = null
+    await user.save()
+    res.clearCookie('app_session')
+    return res.sendStatus(200)
+  } catch (error) {
+    return res.sendStatus(400)
   }
 }

@@ -10,3 +10,7 @@ module.exports.findUserByEmail = async (email) => {
 module.exports.createANewUser = async (payload) => {
   return await db.User.create(payload)
 }
+
+module.exports.findUserById = async (id) => {
+  return await db.User.findOne({ where: { id: id } })
+}

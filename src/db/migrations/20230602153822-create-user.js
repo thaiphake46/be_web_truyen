@@ -26,6 +26,7 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
       },
+      refreshToken: { type: Sequelize.TEXT },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

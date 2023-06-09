@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         allowNull: false,
       },
+      refreshToken: DataTypes.TEXT,
     },
     {
       sequelize,
